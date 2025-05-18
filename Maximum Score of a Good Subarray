@@ -1,0 +1,38 @@
+class Solution:
+    def maximumScore(self, nums: List[int], k: int) -> int:
+        n = len(nums)
+
+        leftBoundary = [-1] * n  # Store the next lower element from the left.
+        rightBoundary = [n] * n  # Store the next lower element from the right.
+
+        leftStack = []  # Monotonic Stack to help calculate left array.
+        rightStack = []  # Monotonic Stack to help calculate right array.
+
+        # Calculate next lower element from the left.
+        for i in range(n - 1, -1, -1):
+            while leftStack and nums[leftStack[-1]] > nums[i]:
+                # If the current element is smaller than elements in the stack,
+                # set the left boundary for those elements to the current element's index.
+                leftBoundary[leftStack[-1]] = i
+                leftStack.pop()
+            leftStack.append(i)
+
+        # Calculate next lower element from the right.
+        for i in range(n):
+            while rightStack and nums[rightStack[-1]] > nums[i]:
+                # If the current element is smaller than elements in the stack,
+                # set the right boundary for those elements to the current element's index.
+                rightBoundary[rightStack[-1]] = i
+                rightStack.pop()
+            rightStack.append(i)
+
+        maxScore = 0  # Initialize the maximum score to 0.
+
+        # Calculate the maximum score for good subarrays.
+        for i in range(n):
+            if leftBoundary[i] < k and rightBoundary[i] > k:
+                # Calculate the score for the subarray that contains element 'k'.
+                subarrayScore = nums[i] * (rightBoundary[i] - leftBoundary[i] - 1)
+                maxScore = max(maxScore, subarrayScore)  # Update the maximum score.
+
+        return maxScore  # Return the maximum score for a good subarray.
